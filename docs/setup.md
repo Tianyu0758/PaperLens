@@ -2,6 +2,15 @@
 
 本手册从新下载的 PaperLens 源码目录开始。Agent 和 RAG API 可在 Windows 或 Linux 上运行；本地 GPU 模型服务使用 Linux/WSL。使用已有远程模型服务时，运行两个 API 的电脑不需要 GPU 或 WSL。
 
+安装 Git 后，可在 PowerShell 或终端中获取源码：
+
+```bash
+git clone https://github.com/Tianyu0758/PaperLens.git
+cd PaperLens
+```
+
+也可在 [GitHub 仓库](https://github.com/Tianyu0758/PaperLens) 选择 **Code → Download ZIP**，解压后进入项目目录。
+
 ## 1. 准备软件
 
 | 软件或服务 | 用途 | 准备方式 |

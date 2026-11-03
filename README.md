@@ -65,6 +65,13 @@ RAG 服务使用 Grobid 解析 PDF，结合稠密向量检索、BM25、RRF 融�
 
 ## 安装与运行
 
+先获取源码（需要 Git；也可以在仓库页面选择 **Code → Download ZIP** 并解压）：
+
+```bash
+git clone https://github.com/Tianyu0758/PaperLens.git
+cd PaperLens
+```
+
 ### 先体验模拟工作台
 
 Windows PowerShell，在仓库根目录执行：
