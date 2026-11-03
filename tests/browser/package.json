@@ -1,0 +1,8 @@
+{
+  "name": "paperlens-browser-checks",
+  "private": true,
+  "description": "Optional browser tests; the workspace itself has no Node build step.",
+  "devDependencies": {
+    "playwright": "1.64.1"
+  }
+}

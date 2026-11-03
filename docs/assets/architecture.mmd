@@ -1,0 +1,54 @@
+---
+config:
+  theme: base
+  look: classic
+  htmlLabels: false
+  themeVariables:
+    fontFamily: Microsoft YaHei, sans-serif
+    fontSize: 16px
+    primaryColor: '#E8F4ED'
+    lineColor: '#758B7E'
+    clusterBkg: '#FBFCFA'
+    clusterBorder: '#CEDDD2'
+  flowchart:
+    htmlLabels: false
+    curve: linear
+    nodeSpacing: 26
+    rankSpacing: 32
+    wrappingWidth: 220
+---
+%% 文件说明：描述主 Agent、规划子 Agent、RAG 与四类工具的关系；SVG 由此文件生成。
+flowchart TB
+    UI["对话工作台<br/>会话 / 执行过程 / 引用 / 文件"] --> API["FastAPI 服务<br/>会话与任务接口 / SSE"]
+    API <--> STATE[("SQLite 与本地文件<br/>上下文 / 事件 / 产物版本")]
+    API --> MAIN["主 Agent<br/>理解目标 / 选择工具 / 汇总回答"]
+
+    subgraph TOOLS["工具层 · 4 个能力域 / 9 项工具"]
+      direction LR
+      PAPER["论文访问 × 3<br/>浏览 / 检索 / 原文读取"]
+      COMPUTE["计算 × 1<br/>Python 执行"]
+      WORKSPACE["会话工作区 × 2<br/>列出 / 读取成果"]
+      PRESENT["演示构建 × 3<br/>规划 / 渲染 / 检查"]
+    end
+
+    MAIN --> PAPER
+    MAIN --> COMPUTE
+    MAIN --> WORKSPACE
+    MAIN --> PRESENT
+    PAPER <--> RAG["RAG 服务<br/>Grobid 解析<br/>向量 + BM25 → RRF → Rerank"]
+    COMPUTE --> DOCKER["Docker 沙箱<br/>计算 / 绘图 / 数据文件"]
+
+    PRESENT --> PLANNER["规划子 Agent<br/>调用论文、计算及稿件读取工具<br/>整理证据与逐页内容"]
+    PLANNER --> PLAN["结构化演示稿<br/>.slides.json + Markdown"]
+    PLAN --> RENDER["模板渲染<br/>离线 HTML / 图解 / 局部交互"]
+    RENDER --> CHECK["浏览器检查<br/>布局 / 溢出 / 交互 / 截图"]
+    CHECK -. "检查反馈与局部修订" .-> MAIN
+
+    classDef primary fill:#E8F4ED,stroke:#34755E,color:#183E2F,stroke-width:1.5px
+    classDef tool fill:#F4F8F5,stroke:#95B6A3,color:#263F33
+    classDef service fill:#EEF3F8,stroke:#7F9CB7,color:#233D53
+    classDef artifact fill:#FCF6E9,stroke:#C4A769,color:#594A2E
+    class UI,API,MAIN,PLANNER primary
+    class PAPER,COMPUTE,WORKSPACE,PRESENT tool
+    class RAG,DOCKER,CHECK service
+    class STATE,PLAN,RENDER artifact

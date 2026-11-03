@@ -1,0 +1,17 @@
+# 文件说明：启动本地 Grobid 与 Qdrant；模型服务和 Python API 在各自环境中运行。
+# 端口只绑定本机，数据存入独立的 Docker volume；可用根目录 .env 修改镜像和端口。
+name: paperlens
+services:
+  grobid:
+    image: ${GROBID_IMAGE:-lfoppiano/grobid:0.8.0}
+    ports:
+      - "127.0.0.1:${GROBID_PORT:-8070}:8070"
+    init: true
+  qdrant:
+    image: ${QDRANT_IMAGE:-qdrant/qdrant:v1.19.0}
+    ports:
+      - "127.0.0.1:${QDRANT_PORT:-6333}:6333"
+    volumes:
+      - qdrant_storage:/qdrant/storage
+volumes:
+  qdrant_storage:

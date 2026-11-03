@@ -1,0 +1,142 @@
+<!doctype html>
+<!--
+文件说明：RAG 自带网页的 HTML 模板，包含 PDF 上传、论文列表和证据问答区域。
+由前端路由返回，静态脚本绑定页面元素并与 RAG API 通信。
+-->
+
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="上传学术论文，通过混合检索和大模型获得有引用的答案。">
+    <title>{{ page_title }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', path='/styles.css') }}">
+    <script defer src="{{ url_for('static', path='/app.js') }}"></script>
+  </head>
+  <body>
+    <div class="page-glow page-glow-left" aria-hidden="true"></div>
+    <div class="page-glow page-glow-right" aria-hidden="true"></div>
+
+    <header class="site-header shell">
+      <a class="brand" href="/" aria-label="PaperLens 首页">
+        <span class="brand-mark">P</span>
+        <span>PaperLens</span>
+      </a>
+      <div class="system-state">
+        <span class="status-dot" aria-hidden="true"></span>
+        本地知识库
+      </div>
+    </header>
+
+    <main class="shell main-layout">
+      <section class="hero">
+        <p class="eyebrow">Academic RAG workspace</p>
+        <h1>让论文回答问题，<br><span>并给出依据。</span></h1>
+        <p class="hero-copy">
+          上传 PDF，系统会解析章节、执行混合检索与重排序，最终生成带来源的回答。
+        </p>
+        <div class="pipeline" aria-label="处理流程">
+          <span>GROBID</span><i></i><span>Hybrid Search</span><i></i><span>Reranker</span><i></i><span>DeepSeek</span>
+        </div>
+      </section>
+
+      <section class="workspace" aria-label="论文知识库工作台">
+        <aside class="library-panel panel">
+          <div class="panel-heading">
+            <div>
+              <p class="section-kicker">01 · Library</p>
+              <h2>论文库</h2>
+            </div>
+            <span id="paper-count" class="count-badge">0</span>
+          </div>
+
+          <form id="upload-form" class="upload-zone">
+            <input id="pdf-file" name="file" type="file" accept="application/pdf,.pdf" required>
+            <label for="pdf-file">
+              <span class="upload-icon" aria-hidden="true">↑</span>
+              <strong>选择 PDF 论文</strong>
+              <small>单个文件，最大 50 MB</small>
+            </label>
+            <button id="upload-button" class="button button-secondary" type="submit">上传并解析</button>
+          </form>
+
+          <div id="upload-status" class="notice" role="status" aria-live="polite" hidden></div>
+
+          <div class="library-title-row">
+            <span>最近上传</span>
+            <button id="refresh-papers" class="text-button" type="button">刷新</button>
+          </div>
+          <div id="paper-list" class="paper-list" aria-live="polite"></div>
+          <p id="empty-library" class="empty-state">还没有可查询的论文，先上传一篇吧。</p>
+        </aside>
+
+        <section class="query-panel panel">
+          <div class="panel-heading">
+            <div>
+              <p class="section-kicker">02 · Ask</p>
+              <h2>向论文提问</h2>
+            </div>
+          </div>
+
+          <form id="query-form">
+            <div class="field-grid">
+              <label class="field">
+                <span>选择论文</span>
+                <select id="paper-select" required>
+                  <option value="">请选择一篇已完成解析的论文</option>
+                </select>
+              </label>
+              <label class="field field-compact">
+                <span>限定章节</span>
+                <select id="section-type">
+                  <option value="">全部章节</option>
+                  <option value="abstract">摘要</option>
+                  <option value="introduction">引言</option>
+                  <option value="related_work">相关工作</option>
+                  <option value="methods">方法</option>
+                  <option value="results">结果</option>
+                  <option value="discussion">讨论</option>
+                  <option value="conclusion">结论</option>
+                  <option value="appendix">附录</option>
+                  <option value="other">其他</option>
+                </select>
+              </label>
+            </div>
+
+            <label class="field question-field">
+              <span>你的问题</span>
+              <textarea id="question" rows="5" maxlength="2000" placeholder="例如：这篇论文为什么同时使用稠密检索和 BM25？" required></textarea>
+              <small><span id="question-count">0</span> / 2000</small>
+            </label>
+            <button id="query-button" class="button button-primary" type="submit">
+              <span class="button-label">检索并生成答案</span>
+              <span class="spinner" aria-hidden="true"></span>
+            </button>
+          </form>
+
+          <div id="query-status" class="notice" role="status" aria-live="polite" hidden></div>
+
+          <article id="answer-card" class="answer-card" hidden>
+            <div class="answer-heading">
+              <div>
+                <p class="section-kicker">Answer</p>
+                <h3>回答</h3>
+              </div>
+              <div id="timings" class="timings"></div>
+            </div>
+            <div id="answer-text" class="answer-text"></div>
+            <div class="citations-block">
+              <h4>引用来源</h4>
+              <ol id="citation-list" class="citation-list"></ol>
+            </div>
+          </article>
+        </section>
+      </section>
+    </main>
+
+    <footer class="shell site-footer">
+      <span>PaperLens Academic RAG Demo</span>
+      <span>答案仅基于已上传论文生成</span>
+    </footer>
+  </body>
+</html>

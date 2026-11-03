@@ -1,0 +1,7 @@
+# Linux/WSL + compatible NVIDIA driver only; install in a separate .venv-models.
+# Keep vLLM's PyTorch/CUDA dependencies separate from the CPU RAG API environment.
+vllm==0.8.5
+transformers==4.51.3
+fastapi>=0.115,<1
+uvicorn[standard]>=0.30,<1
+python-dotenv>=1.0,<2

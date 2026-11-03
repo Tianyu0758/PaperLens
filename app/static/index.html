@@ -1,0 +1,509 @@
+<!doctype html>
+<!--
+文件说明：统一工作台的页面结构，包含历史会话、聊天区域、论文与引用、执行过程及文件面板。
+页面中的按钮、表单和对话框由 app.js 绑定行为，styles.css 负责布局与样式。
+-->
+
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="theme-color" content="#f6f7f2" />
+    <meta
+      name="description"
+      content="在同一个工作台研读论文、追问方法、观察执行过程并生成组会材料。"
+    />
+    <title>PaperLens · 学术工作台</title>
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Crect width='40' height='40' rx='11' fill='%231b6b50'/%3E%3Ctext x='10' y='29' font-size='29' fill='white' font-family='Georgia'%3EP%3C/text%3E%3C/svg%3E"
+    />
+    <link rel="stylesheet" href="/assets/styles.css" />
+    <script type="module" src="/assets/app.js"></script>
+  </head>
+  <body>
+    <svg
+      class="icon-sprite"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-hidden="true"
+    >
+      <symbol id="i-plus" viewBox="0 0 24 24">
+        <path d="M12 5v14M5 12h14" />
+      </symbol>
+      <symbol id="i-chat" viewBox="0 0 24 24">
+        <path d="M20 11.5a8 8 0 0 1-8 8H5l-3 2v-10a9 9 0 0 1 18 0Z" />
+        <path d="M7 10h9M7 14h6" />
+      </symbol>
+      <symbol id="i-book" viewBox="0 0 24 24">
+        <path
+          d="M12 5c-3-2-6-2-10-1v15c4-1 7-1 10 1 3-2 6-2 10-1V4c-4-1-7-1-10 1Zm0 0v15"
+        />
+      </symbol>
+      <symbol id="i-upload" viewBox="0 0 24 24">
+        <path d="M12 16V3m-5 5 5-5 5 5M4 15v5h16v-5" />
+      </symbol>
+      <symbol id="i-arrow" viewBox="0 0 24 24">
+        <path d="m5 12 7-7 7 7m-7-7v15" />
+      </symbol>
+      <symbol id="i-file" viewBox="0 0 24 24">
+        <path d="M13 2H5v20h14V8l-6-6Zm0 0v6h6M8 12h8M8 16h6" />
+      </symbol>
+      <symbol id="i-download" viewBox="0 0 24 24">
+        <path d="M12 3v13m-5-5 5 5 5-5M4 17v4h16v-4" />
+      </symbol>
+      <symbol id="i-activity" viewBox="0 0 24 24">
+        <path d="M2 12h5l3-8 4 16 3-8h5" />
+      </symbol>
+      <symbol id="i-search" viewBox="0 0 24 24">
+        <circle cx="10" cy="10" r="6" />
+        <path d="m15 15 6 6" />
+      </symbol>
+      <symbol id="i-edit" viewBox="0 0 24 24">
+        <path d="m15 4 5 5M4 15 16 3l5 5L9 20l-6 1 1-6Z" />
+      </symbol>
+      <symbol id="i-refresh" viewBox="0 0 24 24">
+        <path d="M20 8a8 8 0 1 0 0 8M20 3v6h-6" />
+      </symbol>
+      <symbol id="i-close" viewBox="0 0 24 24">
+        <path d="m6 6 12 12M6 18 18 6" />
+      </symbol>
+      <symbol id="i-menu" viewBox="0 0 24 24">
+        <path d="M4 6h16M4 12h16M4 18h16" />
+      </symbol>
+      <symbol id="i-check" viewBox="0 0 24 24">
+        <path d="m5 12 4 4L20 5" />
+      </symbol>
+      <symbol id="i-chevron" viewBox="0 0 24 24">
+        <path d="m9 5 7 7-7 7" />
+      </symbol>
+    </svg>
+
+    <div class="app-shell">
+      <aside class="sidebar" id="sidebar" aria-label="会话导航">
+        <a class="brand" href="/" aria-label="PaperLens 首页"
+          ><span class="brand-mark">P<span>✦</span></span
+          ><span>PaperLens<small>你的学术研究工作台</small></span></a
+        >
+        <button class="button primary new-chat" id="new-chat">
+          <svg><use href="#i-plus" /></svg>新对话<span>＋</span>
+        </button>
+        <nav class="main-nav" aria-label="工作台导航">
+          <button id="chat-nav" aria-current="page">
+            <svg><use href="#i-chat" /></svg>对话工作台
+          </button>
+          <button id="library-nav">
+            <svg><use href="#i-book" /></svg>论文库<span id="library-count"
+              >0</span
+            >
+          </button>
+        </nav>
+        <div class="section-label">
+          会话历史<button
+            class="icon-button"
+            id="refresh-sessions"
+            title="刷新会话"
+            aria-label="刷新会话"
+          >
+            <svg><use href="#i-refresh" /></svg>
+          </button>
+        </div>
+        <label class="history-search"
+          ><svg><use href="#i-search" /></svg
+          ><input
+            id="session-search"
+            type="search"
+            placeholder="搜索会话"
+            aria-label="搜索已加载的会话"
+        /></label>
+        <div class="session-list" id="session-list" aria-label="历史会话">
+          <p class="muted small">正在读取会话…</p>
+        </div>
+        <button class="text-button" id="more-sessions" hidden>
+          加载更多会话
+        </button>
+        <div class="sidebar-footer">
+          <button id="identity-button">
+            <span class="avatar">研</span
+            ><span>本机记录<small>恢复与管理会话</small></span
+            ><svg><use href="#i-chevron" /></svg></button
+          ><span class="local-note">每一次思考，都值得留下。</span>
+        </div>
+      </aside>
+
+      <main class="main-panel">
+        <header class="topbar">
+          <button
+            class="icon-button mobile-nav"
+            id="open-nav"
+            aria-label="打开会话导航"
+          >
+            <svg><use href="#i-menu" /></svg>
+          </button>
+          <div class="page-heading">
+            <div class="breadcrumb">
+              工作台<span>/</span><span id="breadcrumb-view">对话</span>
+            </div>
+            <div class="title-row">
+              <h1 id="session-title">新对话</h1>
+              <button
+                class="icon-button"
+                id="rename-session"
+                title="重命名会话"
+                aria-label="重命名会话"
+                hidden
+              >
+                <svg><use href="#i-edit" /></svg>
+              </button>
+            </div>
+          </div>
+          <span class="connection" id="connection-status"
+            ><span class="status-dot"></span><span>连接中</span></span
+          >
+          <button
+            class="icon-button workspace-toggle"
+            id="open-workspace"
+            aria-label="打开论文与任务工作区"
+          >
+            <svg><use href="#i-book" /></svg>
+          </button>
+        </header>
+
+        <section class="chat-view" id="chat-view" aria-label="与论文对话">
+          <div class="thread-scroll" id="thread-scroll">
+            <button class="text-button history-more" id="more-messages" hidden>
+              查看更早的消息
+            </button>
+            <div class="empty-state" id="empty-state">
+              <div class="welcome-mark">
+                <svg><use href="#i-book" /></svg><span>✦</span>
+              </div>
+              <p class="eyebrow">READ. THINK. DISCOVER.</p>
+              <h2>让每一次研读，<br />都有据可循。</h2>
+              <p class="welcome-copy">
+                从一篇论文开始，把问题问深，把想法讲清。<br />你的论文、思考与汇报材料，都在这里。
+              </p>
+              <button class="button welcome-paper" id="choose-paper">
+                <svg><use href="#i-plus" /></svg><span>选择论文，开始对话</span>
+              </button>
+              <a class="example-link" href="/examples/presentation" target="_blank" rel="noopener">先看看 HTML 演示示例 ↗</a>
+              <div class="suggestions">
+                <button
+                  data-prompt="请根据论文证据，用中文分析研究问题、方法、实验结果和局限性，并给出来源。"
+                  data-mode="qa"
+                >
+                  <span class="suggestion-icon">01</span
+                  ><strong>读懂一篇论文</strong
+                  ><span>研究问题、方法与关键发现</span
+                  ><svg><use href="#i-chevron" /></svg>
+                </button>
+                <button
+                  data-prompt="请对比论文提出的方法与基线方法，解释关键改进，并给出论文证据。"
+                  data-mode="qa"
+                >
+                  <span class="suggestion-icon">02</span
+                  ><strong>深入研究方法</strong
+                  ><span>理解思路，核对实验依据</span
+                  ><svg><use href="#i-chevron" /></svg>
+                </button>
+                <button
+                  data-prompt="请根据论文证据制作一份15分钟组会 HTML 演示，包含方法图解、实验分析、引用和讲者备注。完成后检查页面和交互。"
+                  data-mode="agent"
+                >
+                  <span class="suggestion-icon">03</span
+                  ><strong>准备组会汇报</strong
+                  ><span>从论文证据到逐页汇报材料</span
+                  ><svg><use href="#i-chevron" /></svg>
+                </button>
+              </div>
+            </div>
+            <div
+              class="messages"
+              id="messages"
+              aria-live="polite"
+              aria-relevant="additions"
+            ></div>
+            <div class="view-error" id="view-error" role="alert" hidden></div>
+          </div>
+          <form class="composer-wrap" id="composer-form">
+            <div class="composer">
+              <button type="button" class="paper-chip" id="selected-paper">
+                <svg><use href="#i-file" /></svg><span>先选择一篇论文</span
+                ><svg><use href="#i-chevron" /></svg>
+              </button>
+              <label class="sr-only" for="question">输入问题或研究任务</label>
+              <textarea
+                id="question"
+                rows="3"
+                maxlength="8000"
+                placeholder="向论文提问，或继续刚才的思考…"
+              ></textarea>
+              <div class="composer-bottom">
+                <div class="mode-switch" role="group" aria-label="工作模式">
+                  <button
+                    type="button"
+                    data-compose-mode="qa"
+                    aria-pressed="true"
+                  >
+                    论文问答</button
+                  ><button
+                    type="button"
+                    data-compose-mode="agent"
+                    aria-pressed="false"
+                  >
+                    研究助手 <span>✦</span>
+                  </button>
+                </div>
+                <span class="input-count" id="input-count"></span
+                ><button
+                  class="send-button"
+                  id="send-button"
+                  type="submit"
+                  aria-label="发送问题"
+                >
+                  <svg><use href="#i-arrow" /></svg>
+                </button>
+              </div>
+            </div>
+            <div class="composer-caption">
+              <span id="mode-hint">基于论文证据回答，支持连续追问</span
+              ><span class="keyboard-hint"
+                >Enter 发送 · Shift + Enter 换行</span
+              >
+            </div>
+          </form>
+        </section>
+
+        <section
+          class="library-view"
+          id="library-view"
+          aria-label="论文库"
+          hidden
+        >
+          <div class="library-heading">
+            <div>
+              <p class="eyebrow">YOUR RESEARCH LIBRARY</p>
+              <h2>知识，从这里积累。</h2>
+              <p class="muted">选择已入库论文开始研读，或上传一篇新的 PDF。</p>
+            </div>
+            <button class="button primary" data-upload>
+              <svg><use href="#i-upload" /></svg>上传论文
+            </button>
+          </div>
+          <div class="library-toolbar">
+            <span class="muted small">最近入库的 20 篇论文</span
+            ><button class="text-button" id="refresh-papers">
+              <svg><use href="#i-refresh" /></svg>刷新论文库
+            </button>
+          </div>
+          <div id="library-papers" class="library-grid"></div>
+        </section>
+      </main>
+
+      <aside class="workspace" id="workspace" aria-label="论文与任务工作区">
+        <div class="workspace-top">
+          <span class="section-label">研究工作区</span
+          ><button
+            class="icon-button workspace-close"
+            id="close-workspace"
+            aria-label="关闭工作区"
+          >
+            <svg><use href="#i-close" /></svg>
+          </button>
+        </div>
+        <div class="workspace-tabs" role="tablist" aria-label="工作区内容">
+          <button
+            role="tab"
+            id="tab-paper"
+            data-tab="paper"
+            aria-selected="true"
+            aria-controls="panel-paper"
+          >
+            <svg><use href="#i-book" /></svg>论文
+          </button>
+          <button
+            role="tab"
+            id="tab-process"
+            data-tab="process"
+            aria-selected="false"
+            aria-controls="panel-process"
+          >
+            <svg><use href="#i-activity" /></svg>过程
+          </button>
+          <button
+            role="tab"
+            id="tab-files"
+            data-tab="files"
+            aria-selected="false"
+            aria-controls="panel-files"
+          >
+            <svg><use href="#i-file" /></svg>文件<span id="file-count"></span>
+          </button>
+        </div>
+        <section
+          class="workspace-panel"
+          id="panel-paper"
+          role="tabpanel"
+          aria-labelledby="tab-paper"
+        >
+          <div class="paper-select-heading">
+            <h2>当前论文</h2>
+            <button class="text-button" id="browse-papers">浏览论文库</button>
+          </div>
+          <label class="sr-only" for="paper-select">选择已入库论文</label
+          ><select id="paper-select">
+            <option value="">选择已入库论文</option>
+          </select>
+          <div id="paper-info" class="paper-info">
+            <div class="paper-placeholder">
+              <svg><use href="#i-file" /></svg>
+              <p>还没有关联论文</p>
+              <span>选择论文后，即可开始研读。</span>
+            </div>
+          </div>
+          <button class="upload-zone" data-upload>
+            <span class="upload-circle"
+              ><svg><use href="#i-upload" /></svg></span
+            ><strong>上传 PDF 论文</strong><span>解析后自动加入论文库</span>
+          </button>
+          <div
+            class="upload-status"
+            id="upload-status"
+            role="status"
+            hidden
+          ></div>
+          <div class="evidence-heading">
+            <h2>引用与证据</h2>
+            <span class="small muted" id="evidence-count"></span>
+          </div>
+          <div id="evidence-list">
+            <p class="empty-note">
+              回答中的引用会在这里展开，帮助你回到原文核对。
+            </p>
+          </div>
+        </section>
+        <section
+          class="workspace-panel"
+          id="panel-process"
+          role="tabpanel"
+          aria-labelledby="tab-process"
+          hidden
+        >
+          <div class="paper-select-heading">
+            <h2>执行过程</h2>
+            <button
+              class="icon-button"
+              id="refresh-run"
+              title="刷新任务"
+              aria-label="刷新任务"
+            >
+              <svg><use href="#i-refresh" /></svg>
+            </button>
+          </div>
+          <label class="sr-only" for="run-select">选择任务</label
+          ><select id="run-select">
+            <option value="">暂无任务</option>
+          </select>
+          <div class="run-summary" id="run-summary">
+            <p class="empty-note">
+              发送问题后，可以在这里查看检索、计算与生成文件的进度。
+            </p>
+          </div>
+          <div class="event-timeline" id="event-list"></div>
+        </section>
+        <section
+          class="workspace-panel"
+          id="panel-files"
+          role="tabpanel"
+          aria-labelledby="tab-files"
+          hidden
+        >
+          <div class="paper-select-heading">
+            <h2>会话文件</h2>
+            <span class="small muted">按生成轮次保留</span>
+          </div>
+          <div id="file-list">
+            <p class="empty-note">
+              生成的 HTML 演示、大纲、图表和数据文件会保留在这里。
+            </p>
+          </div>
+        </section>
+        <div class="workspace-footer">
+          <span class="status-dot"></span>把结论交给证据，把灵感留给你。
+        </div>
+      </aside>
+    </div>
+    <button class="scrim" id="scrim" aria-label="收起侧边栏" hidden></button>
+    <input type="file" id="pdf-file" accept=".pdf,application/pdf" hidden />
+    <div class="toast" id="toast" role="status" hidden></div>
+
+    <dialog id="identity-dialog">
+      <form id="identity-form">
+        <div class="dialog-heading">
+          <h2>恢复会话记录</h2>
+          <button
+            class="icon-button"
+            type="button"
+            data-close-dialog
+            aria-label="关闭"
+          >
+            <svg><use href="#i-close" /></svg>
+          </button>
+        </div>
+        <p class="muted">
+          这个标识用来找到你的历史会话，并保存在当前浏览器。要查看手工测试的记录，可填写测试时的用户标识。
+        </p>
+        <label class="field-label" for="identity-input">会话记录标识</label
+        ><input
+          id="identity-input"
+          required
+          maxlength="128"
+          placeholder="例如 manual-user-001"
+          autocomplete="off"
+        />
+        <p class="small muted">请记下这个标识，换浏览器后可以用它恢复记录。</p>
+        <div class="dialog-actions">
+          <button type="button" class="button" data-close-dialog>取消</button
+          ><button class="button primary" type="submit">读取会话</button>
+        </div>
+      </form>
+    </dialog>
+    <dialog id="rename-dialog">
+      <form id="rename-form">
+        <div class="dialog-heading">
+          <h2>重命名会话</h2>
+          <button
+            class="icon-button"
+            type="button"
+            data-close-dialog
+            aria-label="关闭"
+          >
+            <svg><use href="#i-close" /></svg>
+          </button>
+        </div>
+        <label class="field-label" for="rename-input">会话名称</label
+        ><input id="rename-input" required maxlength="80" />
+        <div class="dialog-actions">
+          <button type="button" class="button" data-close-dialog>取消</button
+          ><button class="button primary" type="submit">保存名称</button>
+        </div>
+      </form>
+    </dialog>
+    <dialog class="preview-dialog" id="preview-dialog">
+      <div class="dialog-heading">
+        <h2 id="preview-title">文件预览</h2>
+        <button
+          class="icon-button"
+          type="button"
+          data-close-dialog
+          aria-label="关闭预览"
+        >
+          <svg><use href="#i-close" /></svg>
+        </button>
+      </div>
+      <div class="preview-content markdown" id="preview-content"></div>
+    </dialog>
+    <noscript
+      >此工作台需要启用 JavaScript。你也可以访问 /docs 使用接口。</noscript
+    >
+  </body>
+</html>
